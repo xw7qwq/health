@@ -55,32 +55,35 @@ for attempt in $(seq 1 45); do
   sleep 1
 done
 [[ "$health" == healthy ]]
+# The new container serves only its health check; pages and files redirect to the panel and the old API is gone.
 docker exec -i fitflare-app python - <<'PY'
 import json
 import urllib.request
 from urllib.error import HTTPError
 base = 'http://127.0.0.1:9000'
-def get(path):
-    with urllib.request.urlopen(base+path, timeout=10) as response:
-        return json.load(response)
-data = get('/api/dashboard?tables=none')
-assert 'files' not in data and 'tables' not in data
-assert set(get('/api/account')) == {'profile_id', 'has_data'}
-for path in ('/api/admin/session', '/api/authorize', '/profiles/index.json'):
+class KeepRedirects(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+opener = urllib.request.build_opener(KeepRedirects)
+def fetch(path, data=None):
+    request = urllib.request.Request(base + path, data=data, headers={'Content-Type': 'application/json'} if data else {})
     try:
-        get(path)
+        with opener.open(request, timeout=10) as response:
+            return response.status, response.headers.get('Location'), response.read()
     except HTTPError as error:
-        assert error.code == 404
-    else:
-        raise SystemExit('Unexpected management or private-file route: ' + path)
-request = urllib.request.Request(base + '/api/fetch-data', data=b'{}', headers={'Content-Type':'application/json'})
-try:
-    urllib.request.urlopen(request, timeout=10)
-except HTTPError as error:
-    assert error.code == 405
-else:
+        return error.code, error.headers.get('Location'), error.read()
+status, _, body = fetch('/api/health')
+assert status == 200 and json.loads(body)['status'] == 'healthy'
+for path in ('/', '/mobile.html', '/profiles/index.json'):
+    if fetch(path)[:2] != (301, 'https://lucius7.dev/health/'):
+        raise SystemExit('Unexpected response for a retired page or private file: ' + path)
+for path in ('/api/dashboard', '/api/public/v1/me', '/api/admin/session'):
+    status, _, body = fetch(path)
+    if status != 410 or json.loads(body).get('code') != 'gone':
+        raise SystemExit('Unexpected response for a retired API route: ' + path)
+if fetch('/api/fetch-data', data=b'{}')[0] != 405:
     raise SystemExit('HTTP write boundary failed')
-print('Production data access and response checks passed.')
+print('Production redirect and response checks passed.')
 PY
 # Keep the existing compose default pointing to the successfully validated build.
 docker tag "$image" fitflare:latest

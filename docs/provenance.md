@@ -30,7 +30,11 @@ fitflare 整理自 `lucius7` 服务器 `/home/lucius7/fitbaus` 的部署源码�
 
 [PR #3](https://github.com/xw7qwq/health/pull/3) 修复静态资源缓存指纹，[PR #4](https://github.com/xw7qwq/health/pull/4) 修复趋势方向、比较窗口和 HTTPS 链接。公开只读整理保留这些改动，并按当前部署需求移除网页登录、会话、管理面板、原始文件下载和全部 HTTP 写入入口。Google Health 授权和手动同步通过服务器命令行完成，自动同步与历史数据保留。
 
-网站和 API 直接展示配置账户的数据；从旧私有版本升级需要显式设置 `FITFLARE_DATA_ACCESS=public`。当前操作说明以 README、DEPLOYMENT 和 GOOGLE_HEALTH 为准，上面的私有模式记录仅描述先前版本。
+当时网站和 API 直接展示配置账户的数据，从旧私有版本升级需要显式设置 `FITFLARE_DATA_ACCESS=public`。当前操作说明以 README、DEPLOYMENT 和 GOOGLE_HEALTH 为准，上面的私有模式记录仅描述先前版本。
+
+## 2026-10-25 网站并入面板
+
+仪表盘网站、公开 API 和 API 文档并入 lucius7.dev 面板（[panel](https://github.com/xw7qwq/panel)），面板从 Fitflare 推送的快照展示数据。本仓库删除了前端、模板、文档生成器、浏览器测试和 Node 工具链，HTTP 只保留健康检查：旧页面 301 跳到面板，旧接口返回 `410`。同步、授权、面板推送和历史数据不变，`FITFLARE_DATA_ACCESS` 不再读取。
 
 ## 许可与第三方组件
 
@@ -40,4 +44,4 @@ fitflare 整理自 `lucius7` 服务器 `/home/lucius7/fitbaus` 的部署源码�
 
 本次整理不另行授权原项目，也不将整个仓库标记为 MIT。使用和再分发时应核对原作者说明及依赖自身的许可。
 
-`vendor/chart.umd-4.4.1.min.js` 保留 Chart.js 4.4.1 的 Chart.js Contributors 版权和 MIT 声明，也包含 `@kurkle/color` 0.3.2 的 Jukka Kurkela 版权及 MIT 声明。这些声明未被修改或移除。其余依赖的版本见 `requirements.lock` 与 `package-lock.json`。
+2026-10-25 之前的版本在 `vendor/chart.umd-4.4.1.min.js` 中附带 Chart.js 4.4.1（Chart.js Contributors，MIT）和 `@kurkle/color` 0.3.2（Jukka Kurkela，MIT），版权声明未被修改；网站并入面板后已不再包含该文件。其余依赖的版本见 `requirements.lock`。

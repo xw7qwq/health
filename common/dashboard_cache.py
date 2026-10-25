@@ -14,7 +14,6 @@ from common.profile_paths import (
     client_credentials_file_for,
     csv_path_for,
     ensure_dirs_for_cache,
-    list_profiles,
     tokens_file_for,
 )
 
@@ -1603,10 +1602,6 @@ def load_dashboard_cache(profile_id: str | None, rebuild_if_missing: bool = True
     return {}
 
 
-def load_profile_snapshot(profile_id: str | None) -> dict[str, Any]:
-    return _read_json(cache_path_for(profile_id, SNAPSHOT_FILENAME))
-
-
 def load_dataset_rows(profile_id: str | None, dataset: str) -> list[dict[str, Any]]:
     key = str(dataset or "").strip().lower()
 
@@ -1657,29 +1652,3 @@ def load_dataset_rows(profile_id: str | None, dataset: str) -> list[dict[str, An
         return _aggregate_rows(daily_rows, period="month")
 
     return []
-
-
-def build_profile_cards(profile_ids: list[str] | None = None) -> list[dict[str, Any]]:
-    cards: list[dict[str, Any]] = []
-    for profile_id in profile_ids or list_profiles():
-        dashboard = load_dashboard_cache(profile_id, rebuild_if_missing=True)
-        profile = dashboard.get("profile") or {}
-        overview = dashboard.get("overview") or {}
-        stats = {item.get("key"): item for item in dashboard.get("stats") or []}
-        cards.append(
-            {
-                "id": profile_id,
-                "display_name": profile.get("display_name") or profile_id,
-                "member_since": profile.get("member_since"),
-                "last_sync_at": overview.get("latest_sync_at"),
-                "recovery_score": overview.get("recovery_score"),
-                "recovery_label": overview.get("recovery_label"),
-                "sleep_score": (stats.get("sleep_score") or {}).get("latest"),
-                "steps": (stats.get("steps") or {}).get("latest"),
-                "hrv": (stats.get("hrv") or {}).get("latest"),
-                "rhr": (stats.get("rhr") or {}).get("latest"),
-                "latest_date": overview.get("latest_date"),
-            }
-        )
-    cards.sort(key=lambda item: str(item.get("display_name") or item.get("id")))
-    return cards

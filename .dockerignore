@@ -5,7 +5,6 @@
 # Documentation
 README.md
 *.md
-!API.md
 
 # Python
 __pycache__
