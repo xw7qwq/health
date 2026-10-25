@@ -20,7 +20,7 @@ from urllib.parse import urlsplit
 
 from common.dashboard_cache import DATASET_FILES, SNAPSHOT_FILENAME, load_dashboard_cache
 from common.profile_paths import cache_path_for, csv_path_for, ensure_dirs_for_cache
-from common.public_api import build_series_payload
+from common.series import build_series_payload
 
 SCHEMA_VERSION = 1
 DAILY_POINTS = 400

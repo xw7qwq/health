@@ -2,9 +2,11 @@
 
 `profiles/` 含 Google Health / Fitbit 健康记录、账户信息、客户端凭据和 OAuth 令牌；`.env` 可能含 Google OAuth 客户端密钥。Git 忽略规则和 Docker 构建规则排除这些运行数据；备份也必须放在仓库外并限制访问。
 
-网站公开只读：配置 `FITFLARE_DATA_ACCESS=public` 后，任何访问者都能查看唯一账户的仪表盘和只读 API。没有网页登录、管理面板或写入 API；所有授权与同步操作通过服务器命令行完成。公开响应不包含 OAuth 凭据、令牌或原始文件路径，原始 CSV、配置文件及其他账户目录也不能从网站下载。
+服务没有网页和数据接口：HTTP 只回答 `/api/health`，其他页面和文件路径一律 301 跳到 lucius7.dev 面板，旧的 `/api/*` 接口返回 `410`，写入请求返回 `405`。响应不设置 Cookie，也不带 CORS 头；原始 CSV、配置文件和账户目录不会从 HTTP 读出。授权与同步操作通过服务器命令行完成。
 
-新安装从 `deploy/.env.production.example` 开始，仅本机监听，由 HTTPS 代理公开访问。升级时保留自己的配置，不要直接覆盖 `.env`。应用要求显式设置公开访问；旧私有配置或未设置时会拒绝启动。旧管理口令、会话密钥和 Cookie 不再生效。
+健康记录只通过推送到 lucius7.dev 面板展示，面板决定哪些内容公开、哪些需要登录。推送令牌只放在 `.env`，与面板的 `HEALTH_INGEST_TOKEN` 一起轮换。
+
+新安装从 `deploy/.env.production.example` 开始，仅本机监听。升级时保留自己的配置，不要直接覆盖 `.env`。旧的 `FITFLARE_DATA_ACCESS`、管理口令、会话密钥和 Cookie 都不再生效。
 
 ## 报告问题
 

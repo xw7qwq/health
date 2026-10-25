@@ -36,7 +36,6 @@ services:
       - FITFLARE_PANEL_INGEST_URL=${FITFLARE_PANEL_INGEST_URL:-}
       - FITFLARE_PANEL_INGEST_TOKEN=${FITFLARE_PANEL_INGEST_TOKEN:-}
       - FITFLARE_PROFILE_ID=${FITFLARE_PROFILE_ID:-me}
-      - FITFLARE_DATA_ACCESS=${FITFLARE_DATA_ACCESS:-}
     restart: unless-stopped
     # Remove stdin_open and tty for production
     # To access the container for setup, use: docker exec -it fitflare-app bash

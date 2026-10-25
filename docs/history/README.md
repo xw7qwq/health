@@ -6,4 +6,4 @@
 - [运行权限、访问控制与发布检查](2026-09-23-priority.md)
 - [API 文档与交互页面](2026-09-23-api-docs.md)
 
-当前说明见 [项目首页](../../README.md)、[部署指南](../../DEPLOYMENT.md)、[API](../../API.md) 和 [来源记录](../provenance.md)。
+当前说明见 [项目首页](../../README.md)、[部署指南](../../DEPLOYMENT.md) 和 [来源记录](../provenance.md)。2026-10-25 起网站和 API 并入 [lucius7.dev 面板](https://lucius7.dev/health/)，这些记录里的页面和接口都已不在本仓库。
