@@ -23,8 +23,6 @@ AUTO_SYNC_STARTUP_DELAY_SECONDS = env_int('FITFLARE_AUTO_SYNC_STARTUP_DELAY_SECO
 
 def settings():
     return {
-        # Require deliberate publication when upgrading an older private install.
-        'DATA_ACCESS_MODE': os.getenv('FITFLARE_DATA_ACCESS', '').strip().lower(),
         'MAX_CONTENT_LENGTH': 64 * 1024,
         'OWNER_PROFILE_ID': validate_profile_id(os.getenv('FITFLARE_PROFILE_ID', 'me').strip()),
         'PROFILES_DIR': str(Path(ROOT_DIR) / 'profiles'),

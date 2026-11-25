@@ -36,6 +36,8 @@ services:
       - FITFLARE_PANEL_INGEST_URL=${FITFLARE_PANEL_INGEST_URL:-}
       - FITFLARE_PANEL_INGEST_TOKEN=${FITFLARE_PANEL_INGEST_TOKEN:-}
       - FITFLARE_PROFILE_ID=${FITFLARE_PROFILE_ID:-me}
+      # No longer read. Passed through for one more release: the previous image refuses to
+      # start without it, and deploy.sh rolls back to that image under this file.
       - FITFLARE_DATA_ACCESS=${FITFLARE_DATA_ACCESS:-}
     restart: unless-stopped
     # Remove stdin_open and tty for production

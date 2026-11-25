@@ -1,4 +1,4 @@
-"""Push the health snapshot to the lucius7.dev panel.
+"""Push the health snapshot to the panel at panel.lucius7.dev.
 
 The panel (https://github.com/xw7qwq/panel) never connects to this server. The
 scheduler sends it the metric cards, recent daily and weekly series and the
@@ -20,12 +20,12 @@ from urllib.parse import urlsplit
 
 from common.dashboard_cache import DATASET_FILES, SNAPSHOT_FILENAME, load_dashboard_cache
 from common.profile_paths import cache_path_for, csv_path_for, ensure_dirs_for_cache
-from common.public_api import build_series_payload
+from common.series import build_series_payload
 
 SCHEMA_VERSION = 1
 DAILY_POINTS = 400
 WEEKLY_POINTS = 104
-DEFAULT_URL = "https://lucius7.dev/api/v1/ingest/health"
+DEFAULT_URL = "https://panel.lucius7.dev/api/v1/ingest/health"
 STATE_FILENAME = "panel_push.json"
 USER_AGENT = "fitflare-panel-push/1 (+https://github.com/xw7qwq/health)"
 # The panel's public summary covers the 7 days before today in UTC+8, so it
@@ -40,7 +40,7 @@ class PanelPushError(RuntimeError):
 
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
-    # A redirect means a wrong URL (the apex used to redirect to the blog);
+    # A redirect means a wrong URL (the apex lucius7.dev redirects to the blog);
     # following it would turn the POST into a GET and hide the mistake.
     def redirect_request(self, *args, **kwargs):
         return None
