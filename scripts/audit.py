@@ -14,7 +14,7 @@ def forbidden(path):
         or (name.startswith('.env') and not name.endswith('.example'))
         or name in {'client.json', 'google_client.json', 'google_oauth_pending.json', 'fitbit_revocation_pending.json'} or name.startswith('tokens') and '.json' in name
         or path.suffix.lower() in {'.pem', '.key', '.p12'}
-        or 'test-results' in parts or 'playwright-report' in parts
+        or 'test-results' in parts
     )
 
 

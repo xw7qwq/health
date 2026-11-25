@@ -5,9 +5,7 @@ from flask import Flask, jsonify, redirect
 from backend.config import settings, AUTO_SYNC_ENABLED, AUTO_SYNC_INTERVAL_SECONDS, AUTO_SYNC_SCAN_INTERVAL_SECONDS
 from backend.security import install_security
 from backend.sync import start_auto_sync_scheduler, stop_auto_sync_scheduler
-from backend import jobs
 from backend.time_utils import _now_iso
-from common.profile_paths import owner_profile_id
 
 # The website and its public API moved to the panel at panel.lucius7.dev, which receives snapshots from common/panel_push.py.
 PANEL_HEALTH_URL = 'https://panel.lucius7.dev/health/'
@@ -22,9 +20,7 @@ def create_app(config=None):
 
     @app.get('/api/health')
     def health_check():
-        with jobs.lock:
-            active = sum(job.get('status') == 'running' and job.get('profile') == owner_profile_id() for job in jobs.fetch_jobs.values())
-        return jsonify(status='healthy', timestamp=_now_iso(), active_jobs=active,
+        return jsonify(status='healthy', timestamp=_now_iso(),
                        auto_sync_enabled=AUTO_SYNC_ENABLED,
                        auto_sync_interval_seconds=AUTO_SYNC_INTERVAL_SECONDS,
                        auto_sync_scan_interval_seconds=AUTO_SYNC_SCAN_INTERVAL_SECONDS)

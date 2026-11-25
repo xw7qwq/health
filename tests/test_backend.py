@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 os.environ['FITFLARE_AUTO_SYNC_ENABLED'] = 'false'
 from server import PANEL_API_URL, PANEL_HEALTH_URL, create_app
-from backend import jobs, sync
+from backend import sync
 from common import profile_paths
 from tests.fixture import make_fixture
 
@@ -36,7 +36,6 @@ class BackendTests(unittest.TestCase):
         self.config = dict(OWNER_PROFILE_ID='Demo', TESTING=True, PROFILES_DIR=str(self.root / 'profiles'))
         self.app = create_app(self.config)
         self.client = self.app.test_client()
-        jobs.fetch_jobs.clear()
 
     def files(self):
         return {p.relative_to(self.root): p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
@@ -48,9 +47,8 @@ class BackendTests(unittest.TestCase):
             self.assertIn('no-store', response.headers['Cache-Control'])
         body = self.client.get('/api/health').json
         self.assertEqual(body['status'], 'healthy')
-        self.assertEqual(body['active_jobs'], 0)
         self.assertFalse(body['auto_sync_enabled'])
-        self.assertEqual(set(body), {'status', 'timestamp', 'active_jobs', 'auto_sync_enabled',
+        self.assertEqual(set(body), {'status', 'timestamp', 'auto_sync_enabled',
                                      'auto_sync_interval_seconds', 'auto_sync_scan_interval_seconds'})
 
     def test_old_pages_and_file_paths_redirect_to_the_panel_without_serving_files(self):
@@ -98,7 +96,6 @@ class BackendTests(unittest.TestCase):
                     self.assertEqual(response.headers['Allow'], 'GET, HEAD, OPTIONS')
                     self.assertEqual(response.json['code'], 'read_only')
         self.assertEqual(before, self.files())
-        self.assertFalse(jobs.fetch_jobs)
 
     def test_registered_routes_are_read_only_even_with_old_admin_configuration(self):
         self.app.config.update(ADMIN_PASSWORD='old-password', SECRET_KEY='old-session-key')
@@ -161,9 +158,8 @@ class BackendTests(unittest.TestCase):
             sync.auto_sync_stop_event.clear()
             sync.run_auto_sync_cycle()
             run.assert_called_once_with('Demo')
-        for operation in (sync._acquire_profile_fetch_lock, sync.run_fetch_script):
-            with self.assertRaises(ValueError):
-                operation('Hidden', 'untrusted-job')
+        with self.assertRaises(ValueError):
+            sync._acquire_profile_fetch_lock('Hidden', 'untrusted-job')
         with self.assertRaises(ValueError):
             sync._run_auto_sync_for_profile('Hidden')
         self.assertFalse((self.root / 'profiles/Hidden/cache/.fetch.lock').exists())
@@ -172,15 +168,10 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(env['FITBIT_TOKENS_FILE'], str((self.root / 'profiles/Demo/auth/tokens.json').resolve()))
         self.assertEqual(env['FITFLARE_PROFILE_ID'], 'Demo')
 
-    def test_background_jobs_keep_owner_isolation_without_web_controls(self):
-        first, second = jobs.create_fetch('Demo'), jobs.create_fetch('Demo')
-        self.assertNotEqual(first, second)
-        jobs.fetch_jobs['legacy'] = dict(id='legacy', profile='Hidden', status='running')
-        self.assertEqual(self.client.get('/api/health').json['active_jobs'], 0)
+    def test_the_web_job_runner_is_gone(self):
+        # Syncs start only from the scheduler or the command line; nothing in the app can queue one.
         self.assertEqual(self.client.get('/api/fetch-jobs').status_code, 410)
-        self.assertEqual(jobs.fetch_jobs['legacy']['status'], 'running')
-        with self.assertRaises(ValueError):
-            jobs.create_fetch('Hidden')
+        self.assertFalse(hasattr(sync, 'run_fetch_script'))
 
 
 if __name__ == '__main__':
