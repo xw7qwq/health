@@ -66,10 +66,8 @@ profiles/
 **/tokens*.json
 **/tokens*.json.bak
 .env.*
-node_modules/
 tests/
 test-results/
-playwright-report/
 secrets/
 **/*.pem
 **/*.key

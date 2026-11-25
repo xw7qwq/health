@@ -22,7 +22,7 @@ revision=$(git rev-parse HEAD)
 source_dirty=false
 [[ -z "$(git status --porcelain)" ]] || source_dirty=true
 docker build -f "${CHECK_DOCKERFILE:-Dockerfile}" \
-  --label "org.opencontainers.image.source=https://github.com/xw7qwq/fitflare" \
+  --label "org.opencontainers.image.source=https://github.com/xw7qwq/health" \
   --label "org.opencontainers.image.revision=$revision" \
   --label "dev.fitflare.source-dirty=$source_dirty" \
   -t "$image" . > "$results/build.log" 2>&1
