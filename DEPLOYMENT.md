@@ -1,10 +1,10 @@
 # Fitflare 生产部署指南
 
-本文适用于 Linux 上的 Docker Compose 部署。Compose 项目和服务名为 `fitflare`，容器为 `fitflare-app`，配置变量统一使用 `FITFLARE_*`。应用只处理 `FITFLARE_PROFILE_ID` 指定的唯一账户。宿主机只监听 `127.0.0.1:9000`。服务没有网页：HTTP 只回答 `/api/health`，健康记录推送到 lucius7.dev 面板展示。
+本文适用于 Linux 上的 Docker Compose 部署。Compose 项目和服务名为 `fitflare`，容器为 `fitflare-app`，配置变量统一使用 `FITFLARE_*`。应用只处理 `FITFLARE_PROFILE_ID` 指定的唯一账户。宿主机只监听 `127.0.0.1:9000`。服务没有网页：HTTP 只回答 `/api/health`，健康记录推送到 panel.lucius7.dev 面板展示。
 
 ## 当前部署（lucius7 服务器）
 
-- 查看记录：[lucius7.dev/health](https://lucius7.dev/health/)（面板）。`https://fitflare.lucius7.dev/` 仍由 Caddy 反代到本服务，所有页面 301 跳到面板；旧地址 `https://fitbit.lucius7.dev/` 先跳到 fitflare.lucius7.dev，再跳到面板。
+- 查看记录：[panel.lucius7.dev/health](https://panel.lucius7.dev/health/)（面板）。`https://fitflare.lucius7.dev/` 仍由 Caddy 反代到本服务，所有页面 301 跳到面板；旧地址 `https://fitbit.lucius7.dev/` 先跳到 fitflare.lucius7.dev，再跳到面板。
 - 部署目录：`/home/lucius7/fitflare`，即本仓库的 `main` 检出；持久数据在其中的 `profiles/`。
 - 账户目录：`FITFLARE_PROFILE_ID=Lucius7`。健康记录只推送到面板，这台服务器不再对外展示。
 - Caddy 主配置：`/home/lucius7/server-ops/caddy/Caddyfile`，用 `caddyctl check` / `caddyctl apply` 检查并原子加载；服务登记在 `/home/lucius7/server-ops/services.json`。
@@ -34,7 +34,7 @@ chmod 600 .env
 | `FITFLARE_PROFILE_ID` | 新安装为 `me`；迁移时填原数据目录名 |
 | `FITFLARE_AUTO_SYNC_ENABLED` | 首次部署设为 `false`，授权并验证手动同步后再开启 |
 | `GOOGLE_HEALTH_CLIENT_ID` / `_SECRET` | 可选；不填则通过授权命令交互保存 |
-| `FITFLARE_PANEL_INGEST_TOKEN` | 与 lucius7.dev 面板的 `HEALTH_INGEST_TOKEN` 相同时推送快照，见[推送到面板](#推送到面板)；不填就只同步、不展示 |
+| `FITFLARE_PANEL_INGEST_TOKEN` | 与 panel.lucius7.dev 面板的 `HEALTH_INGEST_TOKEN` 相同时推送快照，见[推送到面板](#推送到面板)；不填就只同步、不展示 |
 | `TZ` | 按需要设置容器时区 |
 
 不需要管理员密码或会话密钥。旧的 `FITFLARE_ADMIN_*`、`FITFLARE_SESSION_*`、`FITFLARE_PUBLIC_PROFILES` 和 `FITFLARE_DATA_ACCESS` 配置已不再读取，可以从部署配置中移除。`.env` 不进入镜像和 Git；不要将展开后的 `docker compose config` 输出发布到工单或聊天记录，因为其中可能包含凭据。
@@ -66,7 +66,7 @@ fitflare.example.com {
 }
 ```
 
-参考文件：[deploy/caddy-fitflare.example.caddy](deploy/caddy-fitflare.example.caddy)。不要用示例覆盖已有服务器的其他站点配置；本服务器使用 `server-ops` 的 `caddyctl`。随后打开 HTTPS 地址，应 301 跳到 `https://lucius7.dev/health/`；`/api/public/v1/me` 等旧接口返回 `410`，HTTP 写入请求返回 `405`。业务端口保持仅本机监听。
+参考文件：[deploy/caddy-fitflare.example.caddy](deploy/caddy-fitflare.example.caddy)。不要用示例覆盖已有服务器的其他站点配置；本服务器使用 `server-ops` 的 `caddyctl`。随后打开 HTTPS 地址，应 301 跳到 `https://panel.lucius7.dev/health/`；`/api/public/v1/me` 等旧接口返回 `410`，HTTP 写入请求返回 `405`。业务端口保持仅本机监听。
 
 ## 4. 连接 Google Health 与首次同步
 
@@ -113,9 +113,9 @@ docker exec -it fitflare-app python auth/authorize_google_health.py --configure 
 
 ## 推送到面板
 
-[lucius7.dev](https://lucius7.dev/) 面板（[panel](https://github.com/xw7qwq/panel)）从不连接这台服务器，由 Fitflare 主动推送快照到 `POST /api/v1/ingest/health`：指标卡、最近 400 天的按日序列、最近 104 周的按周序列和最近 10 次睡眠。面板的公开页只显示截至昨天的 7 天平均睡眠和步数，其余内容需要登录面板才能看到。旧网站下线后，面板是查看记录的唯一入口。
+[panel.lucius7.dev](https://panel.lucius7.dev/) 面板（[panel](https://github.com/xw7qwq/panel)）从不连接这台服务器，由 Fitflare 主动推送快照到 `POST /api/v1/ingest/health`：指标卡、最近 400 天的按日序列、最近 104 周的按周序列和最近 10 次睡眠。面板的公开页只显示截至昨天的 7 天平均睡眠和步数，其余内容需要登录面板才能看到。旧网站下线后，面板是查看记录的唯一入口。
 
-在 `.env` 写入推送令牌，值与面板的 `HEALTH_INGEST_TOKEN` 相同，然后执行 `docker compose up -d --no-build fitflare` 让容器读到新变量。`FITFLARE_PANEL_INGEST_URL` 默认是 `https://lucius7.dev/api/v1/ingest/health`，只接受 HTTPS（本机调试可用 `http://127.0.0.1`）。
+在 `.env` 写入推送令牌，值与面板的 `HEALTH_INGEST_TOKEN` 相同，然后执行 `docker compose up -d --no-build fitflare` 让容器读到新变量。`FITFLARE_PANEL_INGEST_URL` 默认是 `https://panel.lucius7.dev/api/v1/ingest/health`，只接受 HTTPS（本机调试可用 `http://127.0.0.1`）。
 
 推送由自动同步的调度线程顺带完成：每次扫描（`FITFLARE_AUTO_SYNC_SCAN_INTERVAL_SECONDS`，默认 300 秒）时，如果同步文件比上次推送时新，或者按 UTC+8 当天还没有推送成功过，就推送一次。面板的公开摘要按“昨天”滚动，所以即使没有新数据，每天零点后也要推一次；内容没变时面板不会写入存储。失败后按 5 分钟、10 分钟、20 分钟……最长 6 小时退避，日志以 `[PANEL]` 开头，最近一次结果和错误写在 `profiles/<账户>/cache/panel_push.json`。没有设置令牌时不做任何事；关闭自动同步时调度线程不启动，需要用 cron 定时执行下面的命令。
 
@@ -197,4 +197,4 @@ docker compose logs --tail 100 fitflare
 curl -fsS http://127.0.0.1:9000/api/health
 ```
 
-容器健康只说明应用在运行；数据有没有到达面板，看 `profiles/<账户>/cache/panel_push.json` 和以 `[PANEL]` 开头的日志。日志可能包含账户标识或授权上下文，对外分享前先脱敏。面板的接口说明见 [lucius7.dev/about](https://lucius7.dev/about/)，安全事项见 [SECURITY.md](SECURITY.md)。
+容器健康只说明应用在运行；数据有没有到达面板，看 `profiles/<账户>/cache/panel_push.json` 和以 `[PANEL]` 开头的日志。日志可能包含账户标识或授权上下文，对外分享前先脱敏。面板的接口说明见 [panel.lucius7.dev/about](https://panel.lucius7.dev/about/)，安全事项见 [SECURITY.md](SECURITY.md)。

@@ -9,9 +9,9 @@ from backend import jobs
 from backend.time_utils import _now_iso
 from common.profile_paths import owner_profile_id
 
-# The website and its public API moved to the lucius7.dev panel, which receives snapshots from common/panel_push.py.
-PANEL_HEALTH_URL = 'https://lucius7.dev/health/'
-PANEL_API_URL = 'https://lucius7.dev/about/'
+# The website and its public API moved to the panel at panel.lucius7.dev, which receives snapshots from common/panel_push.py.
+PANEL_HEALTH_URL = 'https://panel.lucius7.dev/health/'
+PANEL_API_URL = 'https://panel.lucius7.dev/about/'
 
 
 def create_app(config=None):
@@ -32,7 +32,7 @@ def create_app(config=None):
     @app.get('/api/', defaults={'path': ''})
     @app.get('/api/<path:path>')
     def retired_api(path):
-        return jsonify(error='This API has been retired; the data is on the lucius7.dev panel.', code='gone', see=PANEL_API_URL), 410
+        return jsonify(error='This API has been retired; the data is on the panel at panel.lucius7.dev.', code='gone', see=PANEL_API_URL), 410
 
     # Old pages, bookmarks and file paths all land on the panel's health page; no file is ever served.
     @app.get('/', defaults={'path': ''})

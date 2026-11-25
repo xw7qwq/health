@@ -34,7 +34,7 @@ fitflare 整理自 `lucius7` 服务器 `/home/lucius7/fitbaus` 的部署源码�
 
 ## 2026-10-25 网站并入面板
 
-仪表盘网站、公开 API 和 API 文档并入 lucius7.dev 面板（[panel](https://github.com/xw7qwq/panel)），面板从 Fitflare 推送的快照展示数据。本仓库删除了前端、模板、文档生成器、浏览器测试和 Node 工具链，HTTP 只保留健康检查：旧页面 301 跳到面板，旧接口返回 `410`。同步、授权、面板推送和历史数据不变，`FITFLARE_DATA_ACCESS` 不再读取。
+仪表盘网站、公开 API 和 API 文档并入 panel.lucius7.dev 面板（[panel](https://github.com/xw7qwq/panel)），面板从 Fitflare 推送的快照展示数据。本仓库删除了前端、模板、文档生成器、浏览器测试和 Node 工具链，HTTP 只保留健康检查：旧页面 301 跳到面板，旧接口返回 `410`。同步、授权、面板推送和历史数据不变，`FITFLARE_DATA_ACCESS` 不再读取。
 
 ## 许可与第三方组件
 

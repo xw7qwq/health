@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Send the health snapshot to the lucius7.dev panel now, or write it to a file to inspect."""
+"""Send the health snapshot to the panel at panel.lucius7.dev now, or write it to a file to inspect."""
 import argparse
 from pathlib import Path
 import sys

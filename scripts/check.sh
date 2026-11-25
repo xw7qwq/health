@@ -55,7 +55,7 @@ start_preview
 # The running image answers only its health check: pages and files go to the panel, the old API is gone, writes are refused.
 curl -fsS "$BASE_URL/api/health" | python3 -c 'import json, sys; assert json.load(sys.stdin)["status"] == "healthy"'
 for path in / /mobile.html /app.js /server.py /profiles/Demo/auth/tokens.json /profiles/Demo/cache/dashboard.json; do
-  expect '301 https://lucius7.dev/health/' "$BASE_URL$path"
+  expect '301 https://panel.lucius7.dev/health/' "$BASE_URL$path"
 done
 expect '410 ' "$BASE_URL/api/public/v1/me/dashboard"
 expect '405 ' -X POST "$BASE_URL/api/fetch-data"

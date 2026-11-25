@@ -75,7 +75,7 @@ def fetch(path, data=None):
 status, _, body = fetch('/api/health')
 assert status == 200 and json.loads(body)['status'] == 'healthy'
 for path in ('/', '/mobile.html', '/profiles/index.json'):
-    if fetch(path)[:2] != (301, 'https://lucius7.dev/health/'):
+    if fetch(path)[:2] != (301, 'https://panel.lucius7.dev/health/'):
         raise SystemExit('Unexpected response for a retired page or private file: ' + path)
 for path in ('/api/dashboard', '/api/public/v1/me', '/api/admin/session'):
     status, _, body = fetch(path)

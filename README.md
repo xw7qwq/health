@@ -2,13 +2,13 @@
 
 [![Release checks](https://github.com/xw7qwq/health/actions/workflows/check.yml/badge.svg)](https://github.com/xw7qwq/health/actions/workflows/check.yml)
 
-给自己用的健康数据同步服务：通过 Google Health API 同步自己的睡眠、活动、HRV 和静息心率，保留 Fitbit 历史记录，再把快照推送到 [lucius7.dev 面板](https://lucius7.dev/health/)展示。服务本身没有网页；授权和同步通过服务器命令行维护。
+给自己用的健康数据同步服务：通过 Google Health API 同步自己的睡眠、活动、HRV 和静息心率，保留 Fitbit 历史记录，再把快照推送到 [panel.lucius7.dev 面板](https://panel.lucius7.dev/health/)展示。服务本身没有网页；授权和同步通过服务器命令行维护。
 
 ## 一个账户，一份记录
 
 - 定时自动同步；连接、重新授权和手动同步通过服务器命令行完成。
 - 同步后把指标、按日和按周的趋势以及最近的睡眠推送到面板，见 [DEPLOYMENT.md](DEPLOYMENT.md#推送到面板)。面板是查看记录的唯一入口。
-- HTTP 只保留 `/api/health` 健康检查。旧网站的页面和文件路径 301 跳到 `https://lucius7.dev/health/`，旧的 `/api/*` 接口返回 `410 Gone` 并指向面板的接口说明，写入请求一律返回 `405`。
+- HTTP 只保留 `/api/health` 健康检查。旧网站的页面和文件路径 301 跳到 `https://panel.lucius7.dev/health/`，旧的 `/api/*` 接口返回 `410 Gone` 并指向面板的接口说明，写入请求一律返回 `405`。
 
 2026-10-25 起，原来的仪表盘网站、公开 API 和 API 文档并入面板（[panel](https://github.com/xw7qwq/panel)），这个仓库只负责同步和推送。
 
